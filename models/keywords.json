@@ -1,0 +1,166 @@
+{
+  "positive": [
+    {
+      "word": "good",
+      "count": 846
+    },
+    {
+      "word": "great",
+      "count": 415
+    },
+    {
+      "word": "easy",
+      "count": 311
+    },
+    {
+      "word": "nice",
+      "count": 200
+    },
+    {
+      "word": "best",
+      "count": 200
+    },
+    {
+      "word": "communication",
+      "count": 177
+    },
+    {
+      "word": "school",
+      "count": 176
+    },
+    {
+      "word": "useful",
+      "count": 158
+    },
+    {
+      "word": "love",
+      "count": 153
+    },
+    {
+      "word": "really",
+      "count": 131
+    },
+    {
+      "word": "online",
+      "count": 131
+    },
+    {
+      "word": "excellent",
+      "count": 126
+    },
+    {
+      "word": "one",
+      "count": 115
+    },
+    {
+      "word": "helpful",
+      "count": 111
+    },
+    {
+      "word": "class",
+      "count": 108
+    },
+    {
+      "word": "well",
+      "count": 106
+    },
+    {
+      "word": "help",
+      "count": 96
+    },
+    {
+      "word": "make",
+      "count": 95
+    },
+    {
+      "word": "amazing",
+      "count": 85
+    },
+    {
+      "word": "experience",
+      "count": 81
+    }
+  ],
+  "negative": [
+    {
+      "word": "message",
+      "count": 615
+    },
+    {
+      "word": "working",
+      "count": 504
+    },
+    {
+      "word": "load",
+      "count": 286
+    },
+    {
+      "word": "account",
+      "count": 267
+    },
+    {
+      "word": "open",
+      "count": 266
+    },
+    {
+      "word": "login",
+      "count": 258
+    },
+    {
+      "word": "notification",
+      "count": 250
+    },
+    {
+      "word": "day",
+      "count": 236
+    },
+    {
+      "word": "log",
+      "count": 231
+    },
+    {
+      "word": "android",
+      "count": 231
+    },
+    {
+      "word": "fix",
+      "count": 230
+    },
+    {
+      "word": "sign",
+      "count": 222
+    },
+    {
+      "word": "loading",
+      "count": 218
+    },
+    {
+      "word": "keep",
+      "count": 216
+    },
+    {
+      "word": "new",
+      "count": 199
+    },
+    {
+      "word": "send",
+      "count": 180
+    },
+    {
+      "word": "give",
+      "count": 177
+    },
+    {
+      "word": "tried",
+      "count": 169
+    },
+    {
+      "word": "reinstall",
+      "count": 167
+    },
+    {
+      "word": "please",
+      "count": 161
+    }
+  ]
+}

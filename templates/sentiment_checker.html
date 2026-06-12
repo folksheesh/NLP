@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}Sentiment Checker — SentimentIQ{% endblock %}
+
+{% block content %}
+
+<!-- ── Page Header ─────────────────────────────────────────────────────────── -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="gradient-text">Sentiment Checker</span>
+    </h1>
+    <p class="page-subtitle">
+        <i class="bi bi-magic me-1"></i>
+        Analyze the sentiment of any text using our trained ML model in real-time
+    </p>
+</div>
+
+<!-- ── Tab Switcher ────────────────────────────────────────────────────────── -->
+<div class="checker-tabs">
+    <button class="checker-tab active" data-tab="single" onclick="switchTab('single')" id="tab-btn-single">
+        <i class="bi bi-chat-dots me-1"></i> Single Prediction
+    </button>
+    <button class="checker-tab" data-tab="batch" onclick="switchTab('batch')" id="tab-btn-batch">
+        <i class="bi bi-list-ul me-1"></i> Batch Prediction
+    </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: Single Prediction                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="tab-single" class="tab-content active">
+    <div class="row g-4">
+        <!-- Input -->
+        <div class="col-lg-5">
+            <div class="glass-card">
+                <div class="section-header">
+                    <span class="section-icon">✏️</span>
+                    <h2 class="section-title">Input Text</h2>
+                </div>
+
+                <textarea id="single-text-input" class="checker-textarea" rows="6"
+                    placeholder="Enter a review or comment to analyze...&#10;&#10;Example: This application is very useful for online collaboration."></textarea>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn-gradient flex-grow-1" id="analyze-btn" onclick="analyzeSentiment()">
+                        🔍 Analyze Sentiment
+                    </button>
+                    <button class="btn-outline-glass" onclick="document.getElementById('single-text-input').value=''; document.getElementById('single-result').classList.remove('show');">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </div>
+
+                <!-- Sample texts -->
+                <div class="mt-3">
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Quick samples:
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn-outline-glass" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" id="sample-positive"
+                            onclick="document.getElementById('single-text-input').value='This application is very useful for online collaboration. Great features and smooth experience!'">
+                            😊 Positive
+                        </button>
+                        <button class="btn-outline-glass" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" id="sample-neutral"
+                            onclick="document.getElementById('single-text-input').value='The app works okay. Some features are good but others need improvement.'">
+                            😐 Neutral
+                        </button>
+                        <button class="btn-outline-glass" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" id="sample-negative"
+                            onclick="document.getElementById('single-text-input').value='Terrible app! Keeps crashing during meetings. Very frustrating and unreliable.'">
+                            😞 Negative
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="col-lg-7">
+            <!-- Loading -->
+            <div class="loading-spinner" id="single-spinner">
+                <span class="spinner-dot"></span>
+                <span class="spinner-dot"></span>
+                <span class="spinner-dot"></span>
+                <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.85rem;">Analyzing sentiment...</p>
+            </div>
+
+            <!-- Prediction Result -->
+            <div class="prediction-result" id="single-result">
+                <div class="glass-card mb-3">
+                    <div class="section-header">
+                        <span class="section-icon">🎯</span>
+                        <h2 class="section-title">Prediction Result</h2>
+                    </div>
+
+                    <div class="row align-items-center mb-4">
+                        <div class="col-sm-7">
+                            <div id="result-sentiment" class="sentiment-badge positive">
+                                😊 Positive
+                            </div>
+                        </div>
+                        <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Confidence</div>
+                            <div class="confidence-value" id="result-confidence">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Cleaned Text -->
+                    <div class="mb-4" style="background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); padding: 0.75rem 1rem; border: 1px solid rgba(255,255,255,0.04);">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 0.35rem;">Cleaned Text</div>
+                        <div id="result-cleaned-text" style="font-size: 0.88rem; color: var(--text-secondary); word-break: break-word;">-</div>
+                    </div>
+
+                    <!-- Probability Bars -->
+                    <div class="section-header mb-3">
+                        <span class="section-icon">📊</span>
+                        <h3 class="section-title" style="font-size: 0.9rem;">Probability Distribution</h3>
+                    </div>
+
+                    <!-- Positive -->
+                    <div class="probability-bar-container">
+                        <div class="probability-label">
+                            <span style="color: var(--accent-emerald);">😊 Positive</span>
+                            <span id="prob-val-positive" style="color: var(--accent-emerald);">0%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-bar-fill positive" id="prob-bar-positive" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Neutral -->
+                    <div class="probability-bar-container">
+                        <div class="probability-label">
+                            <span style="color: var(--accent-amber);">😐 Neutral</span>
+                            <span id="prob-val-neutral" style="color: var(--accent-amber);">0%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-bar-fill neutral" id="prob-bar-neutral" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Negative -->
+                    <div class="probability-bar-container">
+                        <div class="probability-label">
+                            <span style="color: var(--accent-rose);">😞 Negative</span>
+                            <span id="prob-val-negative" style="color: var(--accent-rose);">0%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-bar-fill negative" id="prob-bar-negative" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: Batch Prediction                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="tab-batch" class="tab-content">
+    <div class="glass-card mb-4">
+        <div class="section-header">
+            <span class="section-icon">📝</span>
+            <h2 class="section-title">Batch Input</h2>
+            <span class="section-badge">One review per line</span>
+        </div>
+
+        <textarea id="batch-text-input" class="checker-textarea" rows="8"
+            placeholder="Enter multiple reviews, one per line:&#10;&#10;bad application&#10;excellent software&#10;meeting keeps crashing&#10;love the collaboration features&#10;too many bugs in this update"></textarea>
+
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn-gradient flex-grow-1" id="batch-btn" onclick="analyzeBatch()">
+                📊 Analyze All Reviews
+            </button>
+            <button class="btn-outline-glass" onclick="document.getElementById('batch-text-input').value=''; document.getElementById('batch-result').classList.remove('show');">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" id="batch-spinner">
+        <span class="spinner-dot"></span>
+        <span class="spinner-dot"></span>
+        <span class="spinner-dot"></span>
+        <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.85rem;">Processing batch reviews...</p>
+    </div>
+
+    <!-- Batch Results -->
+    <div class="prediction-result" id="batch-result">
+        <div class="glass-card mb-3">
+            <div class="section-header">
+                <span class="section-icon">📋</span>
+                <h2 class="section-title">Batch Results</h2>
+                <span class="section-badge"><span id="batch-count">0</span> reviews</span>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="glass-card metric-card" style="padding: 1rem;">
+                        <div class="metric-value" style="font-size: 1.5rem; color: var(--accent-emerald);" id="batch-positive">0</div>
+                        <div class="metric-label">Positive</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card metric-card" style="padding: 1rem;">
+                        <div class="metric-value" style="font-size: 1.5rem; color: var(--accent-amber);" id="batch-neutral">0</div>
+                        <div class="metric-label">Neutral</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card metric-card" style="padding: 1rem;">
+                        <div class="metric-value" style="font-size: 1.5rem; color: var(--accent-rose);" id="batch-negative">0</div>
+                        <div class="metric-label">Negative</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-responsive">
+                <table class="batch-results-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Review</th>
+                            <th>Sentiment</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batch-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Download Button -->
+            <div class="text-center mt-4">
+                <button class="btn-gradient" onclick="downloadBatchCSV()" id="download-csv-btn">
+                    <i class="bi bi-download me-2"></i>Download Results as CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

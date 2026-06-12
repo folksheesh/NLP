@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SentimentIQ{% endblock %}
+
+{% block content %}
+
+<!-- ── Page Header ─────────────────────────────────────────────────────────── -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="gradient-text">Analytics Dashboard</span>
+    </h1>
+    <p class="page-subtitle">
+        <i class="bi bi-microsoft-teams me-1"></i>
+        Microsoft Teams — Google Play Store Reviews Sentiment Analysis
+    </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: KPI Cards                                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+    <!-- Total Reviews -->
+    <div class="col-xl col-md-4 col-sm-6">
+        <div class="glass-card kpi-card animate-in">
+            <div class="kpi-icon total">
+                <i class="bi bi-chat-square-text-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Total Reviews</div>
+                <div class="kpi-value" id="kpi-total">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Positive -->
+    <div class="col-xl col-md-4 col-sm-6">
+        <div class="glass-card kpi-card animate-in">
+            <div class="kpi-icon positive">
+                <i class="bi bi-emoji-smile-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Positive</div>
+                <div class="kpi-value" id="kpi-positive" style="color: #34d399;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Neutral -->
+    <div class="col-xl col-md-4 col-sm-6">
+        <div class="glass-card kpi-card animate-in">
+            <div class="kpi-icon neutral">
+                <i class="bi bi-emoji-neutral-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Neutral</div>
+                <div class="kpi-value" id="kpi-neutral" style="color: #fbbf24;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Negative -->
+    <div class="col-xl col-md-4 col-sm-6">
+        <div class="glass-card kpi-card animate-in">
+            <div class="kpi-icon negative">
+                <i class="bi bi-emoji-frown-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Negative</div>
+                <div class="kpi-value" id="kpi-negative" style="color: #fb7185;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Average Rating -->
+    <div class="col-xl col-md-4 col-sm-6">
+        <div class="glass-card kpi-card animate-in">
+            <div class="kpi-icon rating">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Avg Rating</div>
+                <div class="kpi-value" id="kpi-rating" style="color: #60a5fa;">0</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 & 3: Sentiment Distribution + Rating Distribution              -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+    <!-- Sentiment Pie Chart -->
+    <div class="col-lg-5">
+        <div class="glass-card h-100">
+            <div class="section-header">
+                <span class="section-icon">🍩</span>
+                <h2 class="section-title">Sentiment Distribution</h2>
+                <span class="section-badge">Pie Chart</span>
+            </div>
+            <div class="chart-container chart-container-pie">
+                <canvas id="sentimentPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Bar Chart -->
+    <div class="col-lg-7">
+        <div class="glass-card h-100">
+            <div class="section-header">
+                <span class="section-icon">📊</span>
+                <h2 class="section-title">Rating Distribution</h2>
+                <span class="section-badge">Bar Chart</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="ratingBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: Word Clouds                                                    -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="glass-card">
+            <div class="section-header">
+                <span class="section-icon">☁️</span>
+                <h2 class="section-title">Positive Word Cloud</h2>
+                <span class="section-badge" style="color: #34d399; background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.2);">Positive</span>
+            </div>
+            <img src="{{ url_for('static', filename='wordcloud/positive_wordcloud.png') }}"
+                 alt="Positive Word Cloud" class="wordcloud-img" id="positive-wordcloud"
+                 onerror="this.style.display='none'">
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="glass-card">
+            <div class="section-header">
+                <span class="section-icon">☁️</span>
+                <h2 class="section-title">Negative Word Cloud</h2>
+                <span class="section-badge" style="color: #fb7185; background: rgba(251,113,133,0.12); border-color: rgba(251,113,133,0.2);">Negative</span>
+            </div>
+            <img src="{{ url_for('static', filename='wordcloud/negative_wordcloud.png') }}"
+                 alt="Negative Word Cloud" class="wordcloud-img" id="negative-wordcloud"
+                 onerror="this.style.display='none'">
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: Top Keywords                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="glass-card">
+            <div class="section-header">
+                <span class="section-icon">🔑</span>
+                <h2 class="section-title">Top 20 Positive Keywords</h2>
+            </div>
+            <div class="chart-container" style="height: 500px;">
+                <canvas id="positiveKeywordsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="glass-card">
+            <div class="section-header">
+                <span class="section-icon">🔑</span>
+                <h2 class="section-title">Top 20 Negative Keywords</h2>
+            </div>
+            <div class="chart-container" style="height: 500px;">
+                <canvas id="negativeKeywordsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: Model Performance                                              -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+    <!-- Metric Cards -->
+    <div class="col-12">
+        <div class="glass-card">
+            <div class="section-header">
+                <span class="section-icon">🏆</span>
+                <h2 class="section-title">Model Performance</h2>
+                <span class="section-badge" id="best-model-name">—</span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <!-- Accuracy -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="glass-card metric-card">
+                        <div class="metric-value accuracy" id="metric-accuracy">—</div>
+                        <div class="metric-label">Accuracy</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill accuracy" id="bar-accuracy"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precision -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="glass-card metric-card">
+                        <div class="metric-value precision" id="metric-precision">—</div>
+                        <div class="metric-label">Precision</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill precision" id="bar-precision"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recall -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="glass-card metric-card">
+                        <div class="metric-value recall" id="metric-recall">—</div>
+                        <div class="metric-label">Recall</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill recall" id="bar-recall"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- F1 Score -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="glass-card metric-card">
+                        <div class="metric-value f1" id="metric-f1">—</div>
+                        <div class="metric-label">F1 Score</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill f1" id="bar-f1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Comparison Table -->
+            <div class="section-header mt-2">
+                <span class="section-icon">📋</span>
+                <h3 class="section-title" style="font-size: 0.95rem;">Model Comparison</h3>
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="model-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1 Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="model-table-body">
+                        <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Confusion Matrix -->
+            <div class="section-header mt-2">
+                <span class="section-icon">🔢</span>
+                <h3 class="section-title" style="font-size: 0.95rem;">Confusion Matrix</h3>
+            </div>
+            <div class="text-center">
+                <img id="confusion-matrix-img" src="" alt="Confusion Matrix"
+                     class="confusion-matrix-img" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
